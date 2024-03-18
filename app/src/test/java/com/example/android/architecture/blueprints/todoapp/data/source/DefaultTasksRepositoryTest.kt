@@ -8,6 +8,7 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 
+
 class DefaultTasksRepositoryTest {
     private val task1 = Task("Title1", "Description1")
     private val task2 = Task("Title2", "Description2")
