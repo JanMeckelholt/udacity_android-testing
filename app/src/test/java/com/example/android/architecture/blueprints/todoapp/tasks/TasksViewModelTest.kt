@@ -8,18 +8,31 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import com.example.android.architecture.blueprints.todoapp.getOrAwaitValue
+import org.junit.Before
 
 @RunWith(AndroidJUnit4::class)
 class TasksViewModelTest {
 
+    private lateinit var tasksViewModel: TasksViewModel
+
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
 
+    @Before
+    fun setupViewModel() {
+        tasksViewModel = TasksViewModel(ApplicationProvider.getApplicationContext())
+    }
+
     @Test
     fun addNewTask_setsNewTaskEven() {
-        val taskViewModel = TasksViewModel(ApplicationProvider.getApplicationContext())
-        taskViewModel.addNewTask()
-        val value = taskViewModel.newTaskEvent.getOrAwaitValue()
+        tasksViewModel.addNewTask()
+        val value = tasksViewModel.newTaskEvent.getOrAwaitValue()
         assertNotNull(value.getContentIfNotHandled())
+    }
+
+    @Test
+    fun setFilterAllTasks_tasksAddViewVisible() {
+        tasksViewModel.setFiltering(TasksFilterType.ALL_TASKS)
+        assertTrue(tasksViewModel.tasksAddViewVisible.getOrAwaitValue())
     }
 }
