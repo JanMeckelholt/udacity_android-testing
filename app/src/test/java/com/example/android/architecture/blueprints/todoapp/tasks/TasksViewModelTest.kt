@@ -1,6 +1,8 @@
 package com.example.android.architecture.blueprints.todoapp.tasks
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.example.android.architecture.blueprints.todoapp.R
+import com.example.android.architecture.blueprints.todoapp.Event
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.FakeTestRepository
 import org.junit.Assert.*
@@ -51,6 +53,18 @@ class TasksViewModelTest {
     fun setFilterAllTasks_tasksAddViewVisible() {
         tasksViewModel.setFiltering(TasksFilterType.ALL_TASKS)
         assertTrue(tasksViewModel.tasksAddViewVisible.getOrAwaitValue())
+    }
+
+    @Test
+    fun completeTask_dataAndSnackbarUpdated() {
+        val task = Task("Title", "Description")
+        tasksRepository.addTasks(task)
+        tasksViewModel.completeTask(task, true)
+
+        tasksRepository.tasksServiceData[task.id]?.isCompleted?.let { assertTrue(it) }
+
+        val snackbarText: Event<Int> = tasksViewModel.snackbarText.getOrAwaitValue()
+        assertEquals(snackbarText.getContentIfNotHandled(), R.string.task_marked_complete)
     }
 }
 
