@@ -3,23 +3,18 @@ package com.example.android.architecture.blueprints.todoapp.tasks
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.android.architecture.blueprints.todoapp.R
 import com.example.android.architecture.blueprints.todoapp.Event
+import com.example.android.architecture.blueprints.todoapp.MainDispatcherRule
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.FakeTestRepository
 import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
 import com.example.android.architecture.blueprints.todoapp.getOrAwaitValue
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestDispatcher
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.setMain
 import org.junit.Before
-import org.junit.rules.TestWatcher
-import org.junit.runner.Description
 import timber.log.Timber
 
+@ExperimentalCoroutinesApi
 class TasksViewModelTest {
 
     private lateinit var tasksRepository: FakeTestRepository
@@ -65,18 +60,5 @@ class TasksViewModelTest {
 
         val snackbarText: Event<Int> = tasksViewModel.snackbarText.getOrAwaitValue()
         assertEquals(snackbarText.getContentIfNotHandled(), R.string.task_marked_complete)
-    }
-}
-
-@OptIn(ExperimentalCoroutinesApi::class)
-class MainDispatcherRule(
-    private val testDispatcher: TestDispatcher = UnconfinedTestDispatcher()
-) : TestWatcher() {
-    override fun starting(description: Description) {
-        Dispatchers.setMain(testDispatcher)
-    }
-
-    override fun finished(description: Description) {
-        Dispatchers.resetMain()
     }
 }
