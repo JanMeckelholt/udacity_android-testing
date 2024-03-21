@@ -58,4 +58,20 @@ class TaskDetailFragmentTest {
             onView(withId(R.id.task_detail_complete_checkbox)).check(matches(not(isChecked())))
         }
     }
+
+    @Test
+    fun completedTaskDetails_displayedInUi(){
+        runTest {
+            val completedTask = Task("Completed Task", "Completed Task Desc", true)
+            repository.saveTask(completedTask)
+            val bundle = TaskDetailFragmentArgs(completedTask.id).toBundle()
+            launchFragmentInContainer<TaskDetailFragment>(bundle, R.style.AppTheme)
+            onView(withId(R.id.task_detail_title_text)).check(matches(isDisplayed()))
+            onView(withId(R.id.task_detail_title_text)).check(matches(withText("Completed Task")))
+            onView(withId(R.id.task_detail_description_text)).check(matches(isDisplayed()))
+            onView(withId(R.id.task_detail_description_text)).check(matches(withText("Completed Task Desc")))
+            onView(withId(R.id.task_detail_complete_checkbox)).check(matches(isDisplayed()))
+            onView(withId(R.id.task_detail_complete_checkbox)).check(matches(isChecked()))
+        }
+    }
 }
