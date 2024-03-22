@@ -61,7 +61,6 @@ class TasksActivityTest {
     @Test
     fun editTask() = runBlocking {
         repository.saveTask(Task("TITLE1", "DESCRIPTION1"))
-        //runCurrent()
         val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
         dataBindingIdlingResource.monitorActivity(activityScenario)
 
@@ -80,6 +79,30 @@ class TasksActivityTest {
         onView(withText("NEW TITLE")).check(matches(isDisplayed()))
         // Verify previous task is not displayed.
         onView(withText("TITLE1")).check(doesNotExist())
+
+        activityScenario.close()
+    }
+
+    @Test
+    fun createOneTask_deleteTask() = runBlocking {
+        val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
+        dataBindingIdlingResource.monitorActivity(activityScenario)
+        onView(withId(R.id.add_task_fab)).perform(click())
+        onView(withId(R.id.add_task_title_edit_text)).perform(replaceText("Added TITLE"))
+        onView(withId(R.id.add_task_description_edit_text)).perform(replaceText("Added DESCRIPTION"))
+        onView(withId(R.id.save_task_fab)).perform(click())
+
+        onView(withText("Added TITLE")).check(matches(isDisplayed()))
+
+        onView(withText("Added TITLE")).perform(click())
+        onView(withId(R.id.task_detail_title_text)).check(matches(withText("Added TITLE")))
+        onView(withId(R.id.task_detail_description_text)).check(matches(withText("Added DESCRIPTION")))
+        onView(withId(R.id.task_detail_complete_checkbox)).check(matches(not(isChecked())))
+        onView(withId(R.id.menu_delete)).perform(click())
+
+        onView(withId(R.id.menu_filter)).perform(click())
+        onView(withText(R.string.nav_all)).perform(click())
+        onView(withText("Added TITLE")).check(doesNotExist())
 
         activityScenario.close()
     }
