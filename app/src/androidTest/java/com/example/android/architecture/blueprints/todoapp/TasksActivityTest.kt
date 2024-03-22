@@ -3,6 +3,7 @@ package com.example.android.architecture.blueprints.todoapp
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.replaceText
 import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
@@ -16,6 +17,9 @@ import androidx.test.filters.LargeTest
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksActivity
+import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource
+import com.example.android.architecture.blueprints.todoapp.utils.DataBindingIdlingResource
+import com.example.android.architecture.blueprints.todoapp.utils.monitorActivity
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.not
 import org.junit.After
@@ -41,11 +45,26 @@ class TasksActivityTest {
         ServiceLocator.resetRepository()
     }
 
+    private val dataBindingIdlingResource = DataBindingIdlingResource()
+    @Before
+    fun registerIdlingResource(){
+        IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource)
+        IdlingRegistry.getInstance().register(dataBindingIdlingResource)
+    }
+
+    @After
+    fun unregisterIdlingResource(){
+        IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource)
+        IdlingRegistry.getInstance().unregister(dataBindingIdlingResource)
+    }
+
     @Test
     fun editTask() = runBlocking {
         repository.saveTask(Task("TITLE1", "DESCRIPTION1"))
         //runCurrent()
         val activityScenario = ActivityScenario.launch(TasksActivity::class.java)
+        dataBindingIdlingResource.monitorActivity(activityScenario)
+
         onView(withText("TITLE1")).perform(click())
         onView(withId(R.id.task_detail_title_text)).check(matches(withText("TITLE1")))
         onView(withId(R.id.task_detail_description_text)).check(matches(withText("DESCRIPTION1")))
