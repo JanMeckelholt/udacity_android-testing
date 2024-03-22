@@ -31,7 +31,10 @@ android {
     buildFeatures {
         dataBinding = true
     }
-    testOptions.unitTests { includeAndroidResources = true }
+    testOptions.unitTests {
+        includeAndroidResources = true
+        returnDefaultValues = true
+    }
 
     namespace 'com.example.android.architecture.blueprints.todoapp'
 }
@@ -63,6 +66,7 @@ dependencies {
     implementation "androidx.navigation:navigation-ui-ktx:$navigationVersion"
 
     implementation "androidx.test:core:1.5.0"
+    implementation "androidx.test.espresso:espresso-idling-resource:3.5.1"
 
     // Dependencies for local unit tests
     testImplementation "junit:junit:4.13.2"
