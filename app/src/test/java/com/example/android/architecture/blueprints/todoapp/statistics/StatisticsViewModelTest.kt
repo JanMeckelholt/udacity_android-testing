@@ -5,7 +5,6 @@ import com.example.android.architecture.blueprints.todoapp.MainDispatcherRule
 import com.example.android.architecture.blueprints.todoapp.data.source.FakeTestRepository
 import com.example.android.architecture.blueprints.todoapp.getOrAwaitValue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
@@ -39,12 +38,10 @@ class StatisticsViewModelTest {
 
     @Test
     fun loadTasks_loading() = runTest() {
-        launch {
             statisticsViewModel.refresh()
             assertTrue(statisticsViewModel.dataLoading.getOrAwaitValue())
             runCurrent()
             assertFalse(statisticsViewModel.dataLoading.getOrAwaitValue())
-        }
     }
 
     @Test
