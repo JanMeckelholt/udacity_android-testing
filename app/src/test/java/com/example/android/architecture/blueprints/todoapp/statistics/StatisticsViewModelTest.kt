@@ -33,9 +33,7 @@ class StatisticsViewModelTest {
 
     @Before
     fun setupStatisticsViewModel() {
-        // Initialise the repository with no tasks.
         tasksRepository = FakeTestRepository()
-
         statisticsViewModel = StatisticsViewModel(tasksRepository)
     }
 
@@ -47,5 +45,14 @@ class StatisticsViewModelTest {
             runCurrent()
             assertFalse(statisticsViewModel.dataLoading.getOrAwaitValue())
         }
+    }
+
+    @Test
+    fun loadStatisticsWhenTasksAreUnavailable_callErrorToDisplay() = runTest() {
+        tasksRepository.setReturnError(true)
+        statisticsViewModel.refresh()
+        runCurrent()
+        assertTrue(statisticsViewModel.empty.getOrAwaitValue())
+        assertTrue(statisticsViewModel.error.getOrAwaitValue())
     }
 }

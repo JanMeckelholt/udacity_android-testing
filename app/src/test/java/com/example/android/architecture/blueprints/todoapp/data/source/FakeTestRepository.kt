@@ -9,6 +9,12 @@ import kotlinx.coroutines.runBlocking
 
 class FakeTestRepository : TasksRepository {
 
+    private var shouldReturnError = false
+
+    fun setReturnError(value: Boolean) {
+        shouldReturnError = value
+    }
+
     var tasksServiceData: LinkedHashMap<String, Task> = LinkedHashMap()
 
     private val observableTasks = MutableLiveData<Result<List<Task>>>()
@@ -29,7 +35,7 @@ class FakeTestRepository : TasksRepository {
 
     override fun observeTask(taskId: String): LiveData<Result<Task>> {
         runBlocking { refreshTasks() }
-        return observableTasks.map {  tasks ->
+        return observableTasks.map { tasks ->
             when (tasks) {
                 is Result.Loading -> Result.Loading
                 is Result.Error -> Result.Error(tasks.exception)
@@ -43,14 +49,22 @@ class FakeTestRepository : TasksRepository {
     }
 
     override suspend fun getTask(taskId: String, forceUpdate: Boolean): Result<Task> {
-        tasksServiceData[taskId]?.let {
-            return Result.Success(it)
+        if (shouldReturnError) {
+            return Result.Error(Exception("Test Exception"))
+        } else {
+            tasksServiceData[taskId]?.let {
+                return Result.Success(it)
+            }
         }
         return Result.Error(Exception("Could not find task"))
     }
 
     override suspend fun getTasks(forceUpdate: Boolean): Result<List<Task>> {
-        return Result.Success(tasksServiceData.values.toList())
+        return if (shouldReturnError) {
+            Result.Error(Exception("Test exception"))
+        } else {
+            Result.Success(tasksServiceData.values.toList())
+        }
     }
 
     override suspend fun saveTask(task: Task) {
